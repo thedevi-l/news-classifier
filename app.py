@@ -5,20 +5,23 @@ from model import train_model
 st.set_page_config(page_title="Fake News Classifier", layout="centered")
 
 st.title("📰 Fake News Classifier")
-st.markdown("Введите текст новости, и ИИ определит — **фейк** или **настоящая**.")
+st.markdown("Введите текст новости, и модель определит — **фейковая** она или **настоящая**.")
 
-with st.spinner("Обучение модели..."):
+with st.spinner("🔄 Обучение модели..."):
     model, vectorizer, accuracy = train_model()
 
-user_input = st.text_area("Введите новость:")
+user_input = st.text_area("✏️ Введите текст новости:")
 
 if st.button("Проверить"):
     if user_input.strip() == "":
-        st.warning("Введите текст новости.")
+        st.warning("Пожалуйста, введите текст новости.")
     else:
         input_vec = vectorizer.transform([user_input])
-        prediction = model.predict(input_vec)[0]
-        st.subheader(f"Результат: {prediction.upper()}")
+        proba = model.predict_proba(input_vec)[0]
+        label = model.predict(input_vec)[0]
+        confidence = max(proba)
+
+        st.success(f"✅ Результат: **{label}** (уверенность: {confidence:.2f})")
 
 st.markdown("### 📊 Точность модели")
 fig, ax = plt.subplots()
